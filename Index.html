@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xit Blessed</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    height:100vh;
+    overflow:hidden;
+    background:black;
+}
+
+/* UNIVERSO */
+#universe{
+    position:fixed;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:radial-gradient(circle at center, #0a0a2a 0%, #000 70%);
+}
+
+/* Estrelas */
+.star{
+    position:absolute;
+    width:2px;
+    height:2px;
+    background:white;
+    border-radius:50%;
+    animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle{
+    from{opacity:0.3;}
+    to{opacity:1;}
+}
+
+/* Galáxia */
+.galaxy{
+    position:absolute;
+    width:600px;
+    height:600px;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(0,255,255,0.3) 30%, transparent 70%);
+    border-radius:50%;
+    animation:spin 60s linear infinite;
+    filter:blur(3px);
+}
+
+@keyframes spin{
+    from{transform:translate(-50%,-50%) rotate(0deg);}
+    to{transform:translate(-50%,-50%) rotate(360deg);}
+}
+
+/* Planetas */
+.planet{
+    position:absolute;
+    border-radius:50%;
+    animation:float 20s infinite alternate ease-in-out;
+}
+
+.planet1{
+    width:80px;
+    height:80px;
+    background:radial-gradient(circle,#00ffcc,#004466);
+    top:20%;
+    left:10%;
+}
+
+.planet2{
+    width:120px;
+    height:120px;
+    background:radial-gradient(circle,#ff4d6d,#330000);
+    bottom:15%;
+    right:15%;
+}
+
+@keyframes float{
+    from{transform:translateY(-20px);}
+    to{transform:translateY(20px);}
+}
+
+/* TRANSIÇÃO PREMIUM */
+#transition{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:black;
+    opacity:0;
+    pointer-events:none;
+    transition:1s;
+    z-index:5;
+}
+
+.showTransition{
+    opacity:1;
+}
+
+/* PAINEL */
+#secretPanel{
+    display:none;
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.95);
+    color:white;
+    padding:20px;
+    overflow:auto;
+    z-index:10;
+}
+
+.columns{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+    margin-top:40px;
+}
+
+.column{
+    background:#111;
+    padding:15px;
+    border-radius:10px;
+    box-shadow:0 0 20px #00ffcc33;
+}
+
+.function{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:8px 0;
+    padding:10px;
+    background:#1f1f1f;
+    border-radius:6px;
+    transition:0.3s;
+}
+
+.function.activeEffect{
+    background:#003b2f;
+    box-shadow:0 0 15px #00ff88;
+    transform:scale(1.05);
+}
+
+.toggle{
+    padding:5px 12px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:12px;
+    background:#444;
+    color:white;
+    transition:0.3s;
+}
+
+.toggle.active{
+    background:#00ff88;
+    color:black;
+}
+
+/* Botão */
+#startBtn{
+    margin-top:20px;
+    width:100%;
+    padding:15px;
+    background:#00ffcc;
+    border:none;
+    border-radius:10px;
+    font-weight:bold;
+    font-size:16px;
+    cursor:pointer;
+}
+
+#loadingBox{
+    display:none;
+    margin-top:20px;
+}
+
+.progress{
+    width:100%;
+    height:15px;
+    background:#333;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.bar{
+    width:0%;
+    height:100%;
+    background:#00ff88;
+    transition:0.1s;
+}
+</style>
+</head>
+<body>
+
+<div id="universe">
+    <div class="galaxy"></div>
+    <div class="planet planet1"></div>
+    <div class="planet planet2"></div>
+</div>
+
+<div id="transition"></div>
+
+<div id="secretPanel">
+
+    <div class="columns">
+        <div class="column">
+            <div class="function">Ajuste Sensibilidade <button class="toggle">OFF</button></div>
+            <div class="function">Estabilidade <button class="toggle">OFF</button></div>
+            <div class="function">Reflexo Rápido <button class="toggle">OFF</button></div>
+        </div>
+
+        <div class="column">
+            <div class="function">Limpeza <button class="toggle">OFF</button></div>
+            <div class="function">Boost FPS <button class="toggle">OFF</button></div>
+            <div class="function">Modo Foco <button class="toggle">OFF</button></div>
+            <div class="function">Sincronização <button class="toggle">OFF</button></div>
+        </div>
+    </div>
+
+    <button id="startBtn">INICIAR MÉTODO</button>
+
+    <div id="loadingBox">
+        <div class="progress">
+            <div class="bar" id="bar"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+/* Criar estrelas */
+for(let i=0;i<200;i++){
+    let star=document.createElement("div");
+    star.classList.add("star");
+    star.style.top=Math.random()*100+"%";
+    star.style.left=Math.random()*100+"%";
+    star.style.animationDuration=(Math.random()*3+1)+"s";
+    document.getElementById("universe").appendChild(star);
+}
+
+/* Abrir com 2 toques */
+let tapCount=0;
+document.body.addEventListener("click",function(){
+    tapCount++;
+    if(tapCount>=2){
+        let trans=document.getElementById("transition");
+        trans.classList.add("showTransition");
+
+        setTimeout(()=>{
+            document.getElementById("secretPanel").style.display="block";
+            trans.classList.remove("showTransition");
+        },1000);
+    }
+});
+
+/* Toggle */
+document.querySelectorAll(".toggle").forEach(btn=>{
+    btn.addEventListener("click",function(e){
+        e.stopPropagation();
+        let parent=this.parentElement;
+        if(this.classList.contains("active")){
+            this.classList.remove("active");
+            this.innerText="OFF";
+            parent.classList.remove("activeEffect");
+        } else {
+            this.classList.add("active");
+            this.innerText="ON";
+            parent.classList.add("activeEffect");
+        }
+    });
+});
+
+/* Delay 10s */
+document.getElementById("startBtn").addEventListener("click",function(){
+    document.getElementById("loadingBox").style.display="block";
+    let bar=document.getElementById("bar");
+    let width=0;
+
+    let interval=setInterval(function(){
+        width++;
+        bar.style.width=width+"%";
+        if(width>=100){
+            clearInterval(interval);
+            window.location.href="https://play.google.com/store/apps/details?id=com.dts.freefireth";
+        }
+    },100);
+});
+</script>
+
+</body>
+                                              </html>
